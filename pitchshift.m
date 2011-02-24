@@ -1,5 +1,3 @@
-clear; clc;
-
 input = wavread('piano.wav')';          % input WAV
 fs = 44100;                             % sampling rate
 
