@@ -1,4 +1,5 @@
-input = wavread('piano.wav')';          % input WAV
+wavfile = getappdata(0, 'wavfile');
+input = wavread(wavfile)';          % input WAV
 fs = 44100;                             % sampling rate
 
 setappdata(0, 'fs', fs);

@@ -1,13 +1,11 @@
-clear; clc;
+wavefile = getappdata(0, 'wavfile);
+input = wavread('piano.wav')';          % input WAV
+fs = 44100;                             % sampling rate
 
-%%% Define input signal and sampling rate
+setappdata(0, 'fs', fs);
 
-input = wavread('bow.wav')';    % input WAV
-fs = 44.1e3;                             % input sampling rate
-
-%%% Define global constants
-
-alpha = 13/12;                          % pitch-shift factor
+sliderValue = getappdata(0,'num');
+alpha = sliderValue/12;                 % pitch-shift factor
 N = 512;                                % frame length
 overlap = .75;                          % overlap fraction
 window = hanning(N)';                   % input window
@@ -48,6 +46,4 @@ norm_output = output./max(output);      % normalize the output amplitude
 [t,d]=rat(alpha);                       % determine integer shift ratio
 shifted = resample(output,d,t);         % resample for pitch shift
 
-% sound(input,fs);
-% sound(output,fs);
-% sound(shifted,fs);
+setappdata(0,'shifted', shifted);

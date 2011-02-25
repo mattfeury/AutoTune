@@ -22,7 +22,7 @@ function varargout = noteslide(varargin)
 
 % Edit the above text to modify the response to help noteslide
 
-% Last Modified by GUIDE v2.5 21-Feb-2011 14:16:37
+% Last Modified by GUIDE v2.5 24-Feb-2011 23:15:01
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -58,6 +58,13 @@ handles.output = hObject;
 % Update handles structure
 guidata(hObject, handles);
 
+% gui file chooser
+wavfile = uigetfile(('*.wav'), 'Choose a sound file to autotune');
+setappdata(0,'wavfile', wavfile);
+% enable play button if file is chosen
+if(wavfile) 
+    set(handles.pushbutton1, 'Enable', 'on');
+end;
 % set initial shift value
 initval = 12;
 set(handles.slider1,'Value',initval);
@@ -188,3 +195,19 @@ fs = getappdata(0, 'fs');
 
 % play the sound
 sound(shifted,fs);
+
+
+% --- Executes on button press in pushbutton2.
+function pushbutton2_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton2 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+% gui file chooser
+wavfile = uigetfile(('*.wav'), 'Choose a sound file to autotune');
+setappdata(0,'wavfile', wavfile);
+% disable play button
+set(handles.pushbutton1, 'Enable', 'off');
+% enable play button if file is chosen
+if(wavfile) 
+    set(handles.pushbutton1, 'Enable', 'on');
+end;

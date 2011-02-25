@@ -58,12 +58,15 @@ handles.output = hObject;
 % Update handles structure
 guidata(hObject, handles);
 
-% se
+% gui file chooser
+%wavfile = uigetfile(('*.wav'), 'Choose a sound file to autotune');
+setappdata(0,'wavfile', wavfile);
+% set initial shift value
 initval = 12;
 set(handles.slider1,'Value',initval);
 set(handles.sliderValue_editText,'String', num2str(initval));
 
-% set initial shift value
+% store initial shift value
 setappdata(0,'num', initval);
 
 % UIWAIT makes noteslide wait for user response (see UIRESUME)
