@@ -1,3 +1,16 @@
+% Matt Feury and the Chillwavves
+% Matt Feury, Leah Downey and Mike Hirth
+%
+% CS 4590 Georgia Institute of Technology
+% 2.28.11
+%
+% noteslide.m
+%
+% This provides the GUI and stores the 
+% pitch value when the slider is changed.
+% It also handles file input and plays the
+% output wav.
+
 function varargout = noteslide(varargin)
 % NOTESLIDE MATLAB code for noteslide.fig
 %      NOTESLIDE, by itself, creates a new NOTESLIDE or raises the existing

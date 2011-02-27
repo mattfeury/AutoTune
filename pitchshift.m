@@ -1,49 +1,50 @@
-wavfile = getappdata(0, 'wavfile');
-input = wavread(wavfile)';          % input WAV
+% Matt Feury and the Chillwavves
+% Matt Feury, Leah Downey and Mike Hirth
+%
+% CS 4590 Georgia Institute of Technology
+% 2.28.11
+%
+% pitchshift.m
+%
+% This shifts the pitch according to the note
+% provided from the GUI and stores the output 
+
+wavfile = getappdata(0, 'wavfile');     % get stored wav from GUI
+input = wavread(wavfile)';              % input wav
 fs = 44100;                             % sampling rate
+setappdata(0, 'fs', fs);                % store sampling rate
 
-setappdata(0, 'fs', fs);
-
-sliderValue = getappdata(0,'num');
-alpha = sliderValue/12;                 % pitch-shift factor
-N = 512;                                % frame length
+sliderValue = getappdata(0,'num');      % get stored pitch-shift numerator
+alpha = sliderValue/12;                 % pitch-shift factor, 12 notes in scale
+frameLength = 512;                      % frame length
 overlap = .75;                          % overlap fraction
-window = hanning(N)';                   % input window
+window = hanning(frameLength)';         % input window
 
-%%% Calculate working variables
-
-input_length = length(input);           % length of input signal
-frame_count = floor((input_length-2*N)/(N*(1-overlap)));
+inputLength = length(input);           % length of input signal
+numFrames = floor((inputLength-2*frameLength)/(frameLength*(1-overlap)));
                                         % number of frames in input
-Ra = floor(N*(1-overlap));              % analysis time hop
+Ra = floor(frameLength*(1-overlap));    % analysis time hop
 Rs = floor(alpha*Ra);                   % synthesis time hop
-Wk = (0:(N-1))*2*pi/N;                  % center bin frequencies
-output = zeros(1, input_length*alpha);  % output signal initialization
+Wk = (0:(frameLength-1))*2*pi/frameLength;       % center bin frequencies
+output = zeros(1, inputLength*alpha);  % output signal initialization
 
-%%% Process input frames
+XCurr = fft(window.*input(1:frameLength)); % analyze initial frame
+phiYCurr = angle(XCurr);       % initial frame output phases
 
-Xu_current = fft(window.*input(1:N));   % analyze initial frame
-PhiY_current = angle(Xu_current);       % initial frame output phases
-
-for u=1:frame_count
-    Xu_prev = Xu_current;               % store last frame's STFT
-    PhiY_prev = PhiY_current;           % store last frame's output phases
-    Xu_current = fft(window.*input(u*Ra:u*Ra+N-1));
-                                        % analyze current frame
-    DPhi = angle(Xu_current) - angle(Xu_prev) - Ra*Wk;
-                                        % unwrapped phase change
+for i=1:numFrames
+    XPrev = XCurr;                  % store last frame's STFT
+    phiYPrev = phiYCurr;            % store last frame's output phases
+    XCurr = fft(window.*input(i*Ra:i*Ra+frameLength-1)); % analyze current frame
+    DPhi = angle(XCurr) - angle(XPrev) - Ra*Wk; % unwrapped phase change
     DPhip = mod(DPhi+pi, 2*pi) - pi;    % principle determination (+/- pi)
-    w_hatk = Wk + (1/Ra)*DPhip;         % estimated "real" bin frequency
-    PhiY_current = PhiY_prev + Rs*w_hatk;
-                                        % Phase propagation formula
-    Yu = abs(Xu_current).*exp(j*PhiY_current);
-                                        % output STFT
-    output(u*Rs:u*Rs+N-1) = output(u*Rs:u*Rs+N-1) + real(ifft(Yu));
-                                        % add current frame to output
+    wHat = Wk + (1/Ra)*DPhip;         % estimated "real" bin frequency
+    phiYCurr = phiYPrev + Rs*wHat;     % Phase propagation formula
+    Yu = abs(XCurr).*exp(j*phiYCurr);   % output STFT
+    output(i*Rs:i*Rs+frameLength-1) = output(i*Rs:i*Rs+frameLength-1) + real(ifft(Yu)); % add current frame to output
 end
 
-norm_output = output./max(output);      % normalize the output amplitude
+outputNorm = output./max(output);      % normalize the output amplitude
 [t,d]=rat(alpha);                       % determine integer shift ratio
 shifted = resample(output,d,t);         % resample for pitch shift
 
-setappdata(0,'shifted', shifted);
+setappdata(0,'shifted', shifted);       % store shifted wav
