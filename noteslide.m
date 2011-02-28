@@ -114,9 +114,9 @@ sliderValue = get(handles.slider_editText,'String');
 % convert from string to number if possible, otherwise returns empty
 sliderValue = str2num(sliderValue);
  
-% if user inputs something is not a number, or if the input is less than 0
-% or greater than 24, then the slider value defaults to 12
-if (isempty(sliderValue) || sliderValue < -12 || sliderValue > 12)
+% if user inputs something is not a number, or if the input is less than
+% -23 or greater than 24, then the slider value defaults to 0
+if (isempty(sliderValue) || sliderValue < -23 || sliderValue > 24)
     set(handles.slider1,'Value',0);
     set(handles.slider_editText,'String','0');
 else
