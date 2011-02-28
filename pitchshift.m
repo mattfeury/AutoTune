@@ -13,10 +13,11 @@ wavfile = getappdata(0, 'wavfile');     % get stored wav from GUI
 
 [input, fs] = wavread(wavfile);         % read wav file, get sampling rate
 input = input';                         % complex conjugate transpose
+input.size
 setappdata(0, 'fs', fs);                % store sampling rate
 
 sliderValue = getappdata(0,'num');      % get stored pitch-shift numerator
-alpha = 2^((sliderValue) / 12);      % pitch-shift factor, 12 notes in scale
+alpha = 2^((sliderValue) / 12);         % pitch-shift factor
 frameLength = 512;                      % frame length
 overlap = .75;                          % overlap fraction
 window = hanning(frameLength)';         % input window
