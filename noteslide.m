@@ -79,7 +79,7 @@ if(wavfile)
     set(handles.pushbutton1, 'Enable', 'on');
 end;
 % set initial shift value
-initval = 12;
+initval = 0;
 set(handles.slider1,'Value',initval);
 set(handles.sliderValue_editText,'String', num2str(initval));
 
@@ -116,9 +116,9 @@ sliderValue = str2num(sliderValue);
  
 % if user inputs something is not a number, or if the input is less than 0
 % or greater than 24, then the slider value defaults to 12
-if (isempty(sliderValue) || sliderValue < 12 || sliderValue > 24)
-    set(handles.slider1,'Value',12);
-    set(handles.slider_editText,'String','12');
+if (isempty(sliderValue) || sliderValue < -12 || sliderValue > 12)
+    set(handles.slider1,'Value',0);
+    set(handles.slider_editText,'String','0');
 else
     set(handles.slider1,'Value',sliderValue);
 end
