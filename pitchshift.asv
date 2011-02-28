@@ -3,8 +3,9 @@
 %
 % CS 4590 Georgia Institute of Technology
 % 2.28.11
+%
 % pitchshift.m
-
+%
 % This shifts the pitch according to the note
 % provided from the GUI and stores the output 
 
@@ -36,8 +37,11 @@ for i=1:numFrames
     XCurr = fft(window.*input(i*Ra:i*Ra+frameLength-1)); % analyze current frame
     DPhi = angle(XCurr) - angle(XPrev) - Ra*Wk; % unwrapped phase change
     DPhip = mod(DPhi+pi, 2*pi) - pi;    % principle determination (+/- pi)
-    w_hatk = Wk + (1/Ra)*DPhip;         % estimated "real" bin frequency
-    phiYCurr = phiYPrev + Rs*w_hatk;     % Phase propagation formula
+    wHat = Wk + (1/Ra)*DPhip;         % estimated "real" bin frequency
+
+    trueFreq = 2*pi*(0:(winSize-1))/winSize + deltaPhiPrimeMod/hop; 
+
+    phiYCurr = phiYPrev + Rs*wHat;     % Phase propagation formula
     Yu = abs(XCurr).*exp(j*phiYCurr);   % output STFT
     output(i*Rs:i*Rs+frameLength-1) = output(i*Rs:i*Rs+frameLength-1) + real(ifft(Yu)); % add current frame to output
 end
