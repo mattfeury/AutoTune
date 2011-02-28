@@ -10,8 +10,9 @@
 % provided from the GUI and stores the output 
 
 wavfile = getappdata(0, 'wavfile');     % get stored wav from GUI
-input = wavread(wavfile)';              % input wav
-fs = 44100;                             % sampling rate
+
+[input, fs] = wavread(wavfile);         % read wav file, get sampling rate
+input = input';                         % complex conjugate transpose
 setappdata(0, 'fs', fs);                % store sampling rate
 
 sliderValue = getappdata(0,'num');      % get stored pitch-shift numerator
