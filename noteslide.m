@@ -2,7 +2,7 @@
 % Matt Feury, Leah Downey and Mike Hirth
 %
 % CS 4590 Georgia Institute of Technology
-% 2.28.11
+% 3.1.11
 %
 % noteslide.m
 %
