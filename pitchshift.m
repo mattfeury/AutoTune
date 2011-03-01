@@ -13,7 +13,6 @@ wavfile = getappdata(0, 'wavfile');     % get stored wav from GUI
 
 [input, fs] = wavread(wavfile);         % read wav file, get sampling rate
 input = input';                         % complex conjugate transpose
-input.size
 setappdata(0, 'fs', fs);                % store sampling rate
 
 sliderValue = getappdata(0,'num');      % get stored pitch-shift numerator
@@ -24,24 +23,24 @@ window = hanning(frameLength)';         % input window
 
 inputLength = length(input);                                              % length of input signal
 numFrames = floor((inputLength-2*frameLength)/(frameLength*(1-overlap))); % number of frames in input
-Ra = floor(frameLength*(1-overlap));                                      % analysis time hop
-Rs = floor(alpha*Ra);                                                     % synthesis time hop
-Wk = (0:(frameLength-1))*2*pi/frameLength;                                % center bin frequencies
+hop = floor(frameLength*(1-overlap));                                     % analysis time hop
+hopShifted = floor(alpha*hop);                                            % synthesis time hop
+centerFreqs = (0:(frameLength-1))*2*pi/frameLength;                       % center bin frequencies
 output = zeros(1, inputLength*alpha);                                     % output signal initialization
 
-XCurr = fft(window.*input(1:frameLength));  % analyze initial frame
-phiYCurr = angle(XCurr);                    % initial frame output phases
+stftCurr = fft(window.*input(1:frameLength));  % analyze initial frame
+phaseCurr = angle(stftCurr);                   % initial frame output phases
 
 for i=1:numFrames
-    XPrev = XCurr;                                                                      % store last frame's STFT
-    phiYPrev = phiYCurr;                                                                % store last frame's output phases
-    XCurr = fft(window.*input(i*Ra:i*Ra+frameLength-1));                                % analyze current frame
-    DPhi = angle(XCurr) - angle(XPrev) - Ra*Wk;                                         % unwrapped phase change
-    DPhip = mod(DPhi+pi, 2*pi) - pi;                                                    % principle determination (+/- pi)
-    wHat = Wk + (1/Ra)*DPhip;                                                           % estimated "real" bin frequency
-    phiYCurr = phiYPrev + Rs*wHat;                                                      % Phase propagation formula
-    Yu = abs(XCurr).*exp(j*phiYCurr);                                                   % output STFT
-    output(i*Rs:i*Rs+frameLength-1) = output(i*Rs:i*Rs+frameLength-1) + real(ifft(Yu)); % add current frame to output
+    stftPrev = stftCurr;                                                  % store last frame's STFT
+    phasePrev = phaseCurr;                                                % store last frame's output phases
+    stftCurr = fft(window.*input(i*hop:i*hop+frameLength-1));             % analyze current frame
+    phaseUnwrap = angle(stftCurr) - angle(stftPrev) - hop*centerFreqs;    % unwrapped phase change
+    phaseUnwrapMod = mod(phaseUnwrap+pi, 2*pi) - pi;                      % principle determination (+/- pi)
+    realFreq = centerFreqs + (1/hop)*phaseUnwrapMod;                      % estimated "real" bin frequency
+    phaseCurr = phasePrev + hopShifted*realFreq;                          % Phase propagation formula
+    stftOut = abs(stftCurr).*exp(j*phaseCurr);                            % output STFT
+    output(i*hopShifted:i*hopShifted+frameLength-1) = output(i*hopShifted:i*hopShifted+frameLength-1) + real(ifft(stftOut)); % add current frame to output
 end
 
 outputNorm = output./max(output);       % normalize the output amplitude
